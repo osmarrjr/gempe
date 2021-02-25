@@ -1,15 +1,24 @@
-const User = require('../models/User')
+const jwt = require('jsonwebtoken');
+const authConfig = require('../config/auth');
+const bcrypt = require('bcryptjs');
+const User = require('../models/User');
 
 module.exports = {
-    async store(req, res) {
-        const { email, name, password } = req.body;
 
+    async store (req, res) {
+        const { email, password } = req.body;
         let user = await User.findOne({ email: email });
 
         if(!user) {
-            user = await User.create({ name, email, password });
+            return res.status(400).json({ message: 'Usuário não encontrado.' });
         }
 
-        return res.json(user);
+        if(!(await bcrypt.compare(password, user.password))) {
+            return res.status(400).json({ message: 'Senha incorreta.' });
+        }
+
+        const token = jwt.sign({ id: user.id }, authConfig.secret, { expiresIn: authConfig.expiresIn});
+
+        return res.json({ token });
     }
 }

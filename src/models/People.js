@@ -4,8 +4,8 @@ const PeopleSchema = new mongoose.Schema({
     name: String,
     email: String,
     phone: String,
-    createdAt: Date,
-    updatedAt: Date,
+}, {
+    timestamps: true
 });
 
-module.exports = mongoose.model('Peoples', PeopleSchema);
+module.exports = mongoose.model('People', PeopleSchema);
