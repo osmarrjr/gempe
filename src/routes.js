@@ -4,10 +4,12 @@ const PeopleController = require('./controllers/PeopleController');
 const SessionController = require('./controllers/SessionController');
 const authMidleware = require('./middlewares/auth');
 const routes = express.Router();
+const cors = require('cors');
 
 routes.post('/user', UserController.store);
 routes.post('/session', SessionController.store);
 
+routes.use(cors())
 routes.use(authMidleware);
 
 routes.post('/people', PeopleController.store);
