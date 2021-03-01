@@ -9,7 +9,7 @@ module.exports = {
             return res.json(persons);
 
         } catch (error) {
-            return res.status(500).json({ error: `Houve algum erro ao solicitar a lista de usuários. ${error.message}`});
+            return res.json({ error: `Houve algum erro ao solicitar a lista de usuários. ${error.message}`});
         }
     },
 
@@ -21,13 +21,13 @@ module.exports = {
 
             if(!person) {
                 person = await People.create({ name, email, phone });
-                return res.status(200).json({ message: `O usuário ${person.name} foi cadastrado com sucesso!`});
+                return res.json({ message: `O usuário ${person.name} foi cadastrado com sucesso!`, type: 'success'});
             }
 
-            return res.status(422).json({ message: `O usuário ${person.name} já está cadastrado!` });
+            return res.json({ message: `O usuário ${person.name} já está cadastrado!`, type: 'isRegistered' });
 
         } catch (error) {
-            return res.status(500).json({ error: `Houve um erro ao salvar um novo usuário. ${error.message}`});
+            return res.json({ error: `Houve um erro ao salvar um novo usuário. ${error.message}`});
         }
     },
 
@@ -39,7 +39,7 @@ module.exports = {
             return res.json(person);
 
         } catch (error) {
-            return res.status(500).json({ error: `Houve um erro ao listar este usuário. ${error.message}`});
+            return res.json({ error: `Houve um erro ao listar este usuário. ${error.message}`});
         }
     },
 
@@ -50,46 +50,54 @@ module.exports = {
 
             if(!isEmail) {
                 const peoples = await People.find({ name: new RegExp(q, 'i')});
-                return res.json(peoples);
+
+                if(peoples.length > 0 ) {
+                    return res.json(peoples);
+                }
+                return res.json({ message: 'Nenhum contato encontrado.', type: 'userNotIdentified'});
             }
 
             const peoples = await People.find({ email: new RegExp(q, 'i')});
-            
-            return res.json(peoples);
+
+            if(peoples.length > 0 ) {
+                return res.json(peoples);
+            }
+
+            return res.json({ message: 'Nenhum contato encontrado.', type: 'userNotIdentified'});
+
         } catch (error) {
-            return res.status(500).json({ error: `Houve um erro ao listar este usuário. ${error.message}`});
+            return res.json({ error: `Houve um erro ao listar este usuário. ${error.message}`});
         }
     },
 
     async update (req, res) {
         try {
             const { id } = req.params;
-            const { email } = req.body;
+            const { email } = req.body.data;
             const person = await People.findById(id);
-            let existEmail = false;
+            let existEmail;
 
-            if(req.body.email !== person.email) {
+            if(email !== person.email) {
+                console.log('entrou email diferente')
                 existEmail = await People.findOne({
-                    attributes: ['email'],
-                    where: {
-                        email
-                    }
+                    email: email
                 });
+                console.log(existEmail)
             }
-
-            if(!existEmail) {
+            
+            if(!existEmail || existEmail === undefined) {
                 await person.update({
-                    ...req.body,
+                    ...req.body.data,
                 });
     
                 await person.save();
     
-                return res.status(200).json({ message: `O usuário ${person.name} foi atualizado!` });
+                return res.json({ message: `O usuário ${person.name} foi atualizado!`, type: 'success'});
             }
 
-            return res.status(422).json({ message: `Já existe um usuário cadastrado com este e-mail.` });
+            return res.json({ message: `Já existe um usuário cadastrado com este e-mail.`, type: 'existUser' });
         } catch (error) {
-            return res.status(500).json({ error: `Ocorreu um erro ao atualizar este usuário. ${error.message}` });
+            return res.json({ error: `Ocorreu um erro ao atualizar este usuário. ${error.message}` });
         }
     },
 
@@ -100,10 +108,10 @@ module.exports = {
 
             await person.delete();
 
-            return res.json({ message:  `O usuário ${person.name} foi excluído!` });
+            return res.json({ message: `O usuário ${person.name} foi excluído!`, type: 'success' });
 
         } catch (error) {
-            return res.status(500).json({ error: `Houve um erro ao deletar este usuário. ${error.message}`});
+            return res.json({ error: `Houve um erro ao deletar este usuário.`});
         }
     }
 

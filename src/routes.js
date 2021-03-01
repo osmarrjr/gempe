@@ -16,11 +16,11 @@ routes.use(cors(corsOptions));
 
 routes.post('/user-register', UserController.store);
 routes.post('/session', SessionController.store);
-routes.post('/people', PeopleController.store);
 
 routes.use(authMidleware);
 
 routes.get('/people', PeopleController.index)
+routes.post('/people', PeopleController.store);
 routes.get('/people/:id', PeopleController.show);
 routes.get('/people-filter', PeopleController.getByFilter)
 
