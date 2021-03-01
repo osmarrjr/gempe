@@ -10,11 +10,12 @@ module.exports = {
         let user = await User.findOne({ email: email });
 
         if(!user) {
-            return res.status(400).json({ message: 'Usuário não encontrado.' });
+             return res.json({ message: 'Usuário não encontrado.', type: 'User' });
+
         }
 
         if(!(await bcrypt.compare(password, user.password))) {
-            return res.status(400).json({ message: 'Senha incorreta.' });
+            return res.json({ message: 'Senha incorreta.', type: 'Password' });
         }
 
         const token = jwt.sign({ id: user.id }, authConfig.secret, { expiresIn: authConfig.expiresIn});

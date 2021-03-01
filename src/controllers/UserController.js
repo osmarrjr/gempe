@@ -12,13 +12,13 @@ module.exports = {
                 password = await bcrypt.hash(password, 8);
                 user = await User.create({ name, email, password });
 
-                return res.status(200).json({ message: `O usuário ${user.name} foi criado com sucesso!`});
+                return res.json({ message: `O usuário ${user.name} foi criado com sucesso!`});
             }
 
-            return res.status(422).json({ message: `Já existe um usuário cadastrado com este e-mail.`});
+            return res.json({ message: `Já existe um usuário cadastrado com este e-mail.`});
 
         } catch (error) {
-            return res.status(500).json({ message: `Houve um erro ao criar um novo usuário. ${error.message}` });
+            return res.json({ message: `Houve um erro ao criar um novo usuário. ${error.message}` });
         }
     }
 }

@@ -4,6 +4,7 @@ const routes = require('./routes');
 const login = process.env.MONGO_LOGIN;
 const password = process.env.MONGO_PASSWORD;
 const app = express();
+const cors = require('cors');
 
 mongoose.connect(`mongodb+srv://${login}:${password}@gempe.owuo6.mongodb.net/GEMPE?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
@@ -12,5 +13,4 @@ mongoose.connect(`mongodb+srv://${login}:${password}@gempe.owuo6.mongodb.net/GEM
 
 app.use(express.json());
 app.use(routes);
-
 app.listen(3333);
